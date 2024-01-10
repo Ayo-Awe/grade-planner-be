@@ -21,7 +21,7 @@ jobs:
       - name: Install pipenv # Install Pipenv
         run: pip install pipenv
       - name: Generate requirements.txt
-        run: pipenv run pip freeze > requirements.txt # Generate the file
+        run: pipenv requirements > requirements.txt # Generate the file
       - name: Commit requirements.txt # Commit the generated file
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
