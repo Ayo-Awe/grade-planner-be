@@ -19,7 +19,7 @@ jobs:
       - name: Install pipenv  # Install Pipenv
         run: pip install pipenv
       - name: Generate requirements.txt
-        run: pipenv lock -r > requirements.txt  # Generate the file
+        run: pipenv lock > requirements.txt  # Generate the file
       - name: Commit requirements.txt  # Commit the generated file
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
