@@ -1,5 +1,4 @@
-from utils.result import parse_result
-from utils.course_reg import parse_course_registration
+from core import parse_result, parse_course_registration
 
 from fastapi import FastAPI,  UploadFile
 from fastapi.responses import JSONResponse
