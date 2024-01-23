@@ -26,6 +26,23 @@ class Semester(BaseModel):
     total_units: int
 
 
+class EGRCourses(BaseModel):
+    course_code: str
+    title: str
+    unit: int
+
+
+class EGRSemester(BaseModel):
+    courses: list[EGRCourses]
+
+
+class EstimateGradeRequest(BaseModel):
+    cgpa: float
+    current_units: int
+    target_cgpa: float
+    new_semesters: list[EGRSemester]
+
+
 class SuccessResponse(BaseModel, Generic[T]):
     status: str
     data: T

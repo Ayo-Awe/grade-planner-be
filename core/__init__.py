@@ -1,3 +1,0 @@
-from course_reg import parse_course_registration
-from course_structure import parse_course_structure
-from result import parse_result
