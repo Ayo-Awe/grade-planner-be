@@ -15,7 +15,7 @@ def parse_course_registration(stream: any) -> list[dict]:
 def get_courses(rows: list[list[str]]) -> list[dict]:
     courses = []
 
-    for row in rows[1:-1]:  # skip header and total row
+    for row in rows[1:-1]:  # skip header (first) row and total (last) row
 
         course = {}
         course["course_code"] = row[0]
