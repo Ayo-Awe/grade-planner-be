@@ -1,87 +1,53 @@
-from core.result import parse_result
-from core.course_reg import parse_course_registration
-from core.course_structure import parse_course_structure
-from core.grade_estimator import GradeEstimator
-
-from fastapi import FastAPI,  UploadFile
-from fastapi.responses import JSONResponse
-from model import SuccessResponse, CourseRegData, ResultData, EstimateGradeRequest
-from functools import reduce
+from fastapi import APIRouter, FastAPI
+from routes import course_registration, course_structure, generate_grades, result
+from utils import format_response
 
 
 app = FastAPI()
 
 
-@app.post("/api/v1/course_reg")
-async def upload_course_registration(file: UploadFile) -> SuccessResponse[CourseRegData]:
-    try:
-        if file.content_type != "application/pdf":
-            return JSONResponse(status_code=400, content={"status": "error",
-                                                          "message": "Wrong file format. File must be of type application/pdf"})
-
-        courses = parse_course_registration(await file.read())
-        return {"status": "success", "data": {"courses": courses}}
-    except:
-        return JSONResponse(status_code=400, content={"status": "error",
-                                                      "message": "Unable to parse course registration"})
+@app.get("/")
+def root_handler():
+    return format_response({"message": "Welcome to grade planner"})
 
 
-@app.post("/api/v1/course_structure")
-async def upload_course_registration(file: UploadFile):
-    try:
-        if file.content_type != "application/pdf":
-            return JSONResponse(status_code=400, content={"status": "error",
-                                                          "message": "Wrong file format. File must be of type application/pdf"})
+api_router = APIRouter(prefix="/api/v1")
 
-        semesters = parse_course_structure(await file.read())
-        return {"status": "success", "data": {"semesters": semesters}}
-    except:
-        return JSONResponse(status_code=400, content={"status": "error",
-                                                      "message": "Unable to parse course registration"})
+api_router.include_router(course_registration.router)
+api_router.include_router(course_structure.router)
+api_router.include_router(result.router)
+api_router.include_router(generate_grades.router)
+
+app.include_router(api_router)
 
 
-@app.post("/api/v1/result")
-async def upload_result(file: UploadFile) -> SuccessResponse[ResultData]:
-    try:
+# @app.post("/api/v1/estimate")
+# async def estimate_grades(er: EstimateGradeRequest):
+#     # get target grade points
+#     req = er.model_dump()
+#     semesters = req["new_semesters"]
+#     new_semester_units = 0
 
-        if file.content_type != "application/pdf":
-            return JSONResponse(status_code=400, content={"status": "error",
-                                                          "message": "Wrong file format. File must be of type application/pdf"})
+#     for i, semester in enumerate(semesters):
+#         tu = reduce(lambda x, y: x + y["unit"], semester["courses"], 0)
+#         new_semester_units += tu
+#         semesters[i]["total_units"] = tu
 
-        semesters = parse_result(await file.read())
-        return {"status": "success", "data": {"semesters": semesters}}
-    except:
-        return JSONResponse(status_code=400, content={"status": "error",
-                                                      "message": "Unable to parse course registration"})
+#     total_units = req["current_units"] + new_semester_units
+#     target_gp = (total_units * req["target_cgpa"]) - \
+#         (req["current_units"] * req["cgpa"])
 
+#     res = []
 
-@app.post("/api/v1/estimate")
-async def estimate_grades(er: EstimateGradeRequest):
-    # get target grade points
-    req = er.model_dump()
-    semesters = req["new_semesters"]
-    new_semester_units = 0
+#     for semester in semesters:
+#         estimator = GradeEstimator(semester["courses"], "")
+#         weighted_dist = round(
+#             target_gp * (semester["total_units"]/new_semester_units))
 
-    for i, semester in enumerate(semesters):
-        tu = reduce(lambda x, y: x + y["unit"], semester["courses"], 0)
-        new_semester_units += tu
-        semesters[i]["total_units"] = tu
+#         solns = estimator.generate(weighted_dist)
 
-    total_units = req["current_units"] + new_semester_units
-    target_gp = (total_units * req["target_cgpa"]) - \
-        (req["current_units"] * req["cgpa"])
+#         gpa = round(weighted_dist / semester["total_units"], 2)
+#         sb = {"gpa": gpa, "solutions":  solns,  "grade_point": weighted_dist}
+#         res.append(sb)
 
-    res = []
-
-    for semester in semesters:
-        estimator = GradeEstimator(semester["courses"], "")
-        weighted_dist = round(
-            target_gp * (semester["total_units"]/new_semester_units))
-
-        solns = estimator.get_estimate(weighted_dist)
-
-        gpa = round(weighted_dist / semester["total_units"], 2)
-        sb = {"gpa": gpa, "solutions":  solns,  "grade_point": weighted_dist}
-        res.append(sb)
-
-    return {"semesters": res}
+#     return {"semesters": res}
