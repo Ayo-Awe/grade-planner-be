@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from core.grade_generator import GradeGenerator
 
 from model import FIVE_POINT_GP_SYSTEM, Semester, SuccessResponse
-from utils import format_error_response, format_response
+from utils import calculate_gpa, format_error_response, format_response
 
 router = APIRouter()
 
@@ -38,6 +38,7 @@ class Pattern(BaseModel):
 
 class GenerateGradesResponse(BaseModel):
     patterns: list[Pattern]
+    generated_gpa: float
 
 
 @router.post("/generate_grades")
@@ -47,6 +48,9 @@ async def generate_grades(request: GenerateGradesRequest) -> GenerateGradesRespo
     semester = req["semester"]
     semester = Semester(semester["courses"], FIVE_POINT_GP_SYSTEM)
 
+    if request.target_cgpa > 5:
+        return format_error_response("Target CGPA must be less than or equal to 5", "INVALID_TARGET_CGPA", 400)
+
     target_gp_sum = semester.calculate_grade_points_sum(
         request.target_cgpa)
 
@@ -55,6 +59,8 @@ async def generate_grades(request: GenerateGradesRequest) -> GenerateGradesRespo
 
     if len(patterns) == 0:
         err_message = "There a no valid grade combinations for your specified requirements"
-        return format_error_response(err_message, "GRADES_NOT_GENERABLE", 422)
+        return format_error_response(err_message, "NO_VALID_GRADE_COMBINATION", 422)
 
-    return format_response({"patterns": patterns})
+    generated_gpa = round(calculate_gpa(patterns[0]["generated_grades"]), 2)
+
+    return format_response({"patterns": patterns, "generated_gpa": generated_gpa})

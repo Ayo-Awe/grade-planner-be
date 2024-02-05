@@ -19,7 +19,7 @@ class CourseRegData(BaseModel):
     courses: list[Course]
 
 
-@router.post("/course_reg")
+@router.post("/course_registration")
 async def upload_course_registration(file: UploadFile) -> SuccessResponse[CourseRegData]:
     try:
         if file.content_type != "application/pdf":
