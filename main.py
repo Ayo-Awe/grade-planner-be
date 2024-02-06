@@ -1,9 +1,22 @@
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes import course_registration, course_structure, generate_grades, result
 from utils import format_response
 
 
 app = FastAPI()
+
+origins = [
+    "https://grade-planner.vercel.app/",
+    "http://localhost",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+)
 
 
 @app.get("/")
