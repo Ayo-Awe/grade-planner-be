@@ -1,15 +1,28 @@
 import fitz
+import re
 
 
-def parse_course_structure(stream: any) -> list[dict]:
+def parse_course_structure(stream: any) -> tuple[list[dict], list[str]]:
     rows = []
     doc = fitz.open(stream=stream)
+    text = ""
+
     for page in doc:
+        text += page.get_text()
         tables = page.find_tables()
         for table in tables:
             rows.extend(table.extract())
 
-    return get_semesters(rows)
+    titles = re.compile(
+        r"\d00 Level In (?:Omega|Alpha) Semester").findall(text)
+
+    semesters = []
+
+    for semester, title in zip(get_semesters(rows), titles):
+        semester["title"] = title.replace("In ", "")
+        semesters.append(semester)
+
+    return semesters
 
 
 def get_semesters(rows: list[list[str]]) -> list[dict]:

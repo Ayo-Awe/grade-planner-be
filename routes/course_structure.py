@@ -19,6 +19,7 @@ class Course(BaseModel):
 
 class Semester(BaseModel):
     courses: list[Course]
+    title: str
     total_units: int
     elective_units: Optional[int]
 
