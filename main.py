@@ -8,7 +8,7 @@ app = FastAPI()
 
 origins = [
     "https://grade-planner.vercel.app/",
-    "http://localhost",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
