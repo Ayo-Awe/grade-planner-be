@@ -1,10 +1,11 @@
+from functools import reduce
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, UploadFile
 from pydantic import BaseModel
 
 from core.result import parse_result
 from model import SuccessResponse
-from utils import format_error_response, format_response
+from utils import calculate_cgpa, format_error_response, format_response
 
 router = APIRouter()
 
@@ -27,6 +28,8 @@ class SemesterResult(BaseModel):
 
 class ResultData(BaseModel):
     semesters: list[SemesterResult]
+    cgpa: float
+    total_units: int
 
 
 @router.post("/result")
@@ -37,8 +40,9 @@ async def upload_result(file: UploadFile) -> SuccessResponse[ResultData]:
             err_message = "Wrong file format. File must be of type application/pdf"
             return format_error_response(err_message, "INVALID_FILE_TYPE", 400)
 
-        semesters = parse_result(await file.read())
-        return format_response({"semesters": semesters})
+        results = parse_result(await file.read())
+
+        return format_response(results)
 
     except:
         err_message = "Unable to parse result transcript. Please provide a valid document"

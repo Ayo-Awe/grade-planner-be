@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Any
 from fastapi.responses import JSONResponse
 
@@ -18,6 +19,16 @@ def calculate_gpa(graded_courses: list[dict]) -> float:
         total_units += gc["unit"]
 
     return gp_sum/total_units
+
+
+def calculate_cgpa(semester_results: list[dict]) -> float:
+    total_units = reduce(lambda sum, sem: sum +
+                         sem["total_units"], semester_results, 0)
+
+    grade_point_sum = reduce(lambda sum, sem: sum +
+                             sem["total_grade_points"], semester_results, 0)
+
+    return grade_point_sum/total_units
 
 
 def format_error_response(message: str, code: str, status_code=500,) -> JSONResponse:

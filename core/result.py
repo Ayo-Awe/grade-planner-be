@@ -1,4 +1,7 @@
+from functools import reduce
 import fitz
+
+from utils import calculate_cgpa
 
 
 def parse_result(stream: any) -> list[list[dict]]:
@@ -10,8 +13,11 @@ def parse_result(stream: any) -> list[list[dict]]:
 
     rows = clean_result(rows)
     semesters = get_semesters(rows)
+    cgpa = round(calculate_cgpa(semesters), 2)
+    total_units = reduce(lambda sum, sem: sum +
+                         sem["total_units"], semesters, 0)
 
-    return semesters
+    return {"semesters": semesters, "cgpa": cgpa, "total_units": total_units}
 
 
 def get_semesters(rows: list[list[str]]) -> list[dict]:
