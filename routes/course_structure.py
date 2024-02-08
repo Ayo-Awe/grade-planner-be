@@ -18,6 +18,7 @@ class Course(BaseModel):
 
 
 class Semester(BaseModel):
+    id: str
     courses: list[Course]
     title: str
     total_units: int

@@ -19,6 +19,7 @@ class CourseResult(BaseModel):
 
 
 class SemesterResult(BaseModel):
+    id: str
     courses: list[CourseResult]
     title: str
     gpa: float

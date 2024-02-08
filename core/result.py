@@ -1,4 +1,5 @@
 from functools import reduce
+from uuid import uuid4
 import fitz
 
 from utils import calculate_cgpa
@@ -42,6 +43,7 @@ def get_semesters(rows: list[list[str]]) -> list[dict]:
         course["grade_point"] = int(row[4])
 
         if course["title"].lower() == "total":
+            current_semester["id"] = str(uuid4())
             current_semester["total_units"] = course["unit"]
             current_semester["total_grade_points"] = course["grade_point"]
             current_semester["gpa"] = round(

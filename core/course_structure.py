@@ -1,3 +1,4 @@
+from uuid import uuid4
 import fitz
 import re
 
@@ -20,6 +21,7 @@ def parse_course_structure(stream: any) -> tuple[list[dict], list[str]]:
 
     for semester, title in zip(get_semesters(rows), titles):
         semester["title"] = title.replace("In ", "")
+        semester["id"] = str(uuid4())
         semesters.append(semester)
 
     return semesters
