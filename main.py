@@ -7,7 +7,7 @@ from utils import format_response
 app = FastAPI()
 
 origins = [
-    "https://grade-planner.vercel.app/",
+    "https://grade-planner.vercel.app",
     "http://localhost:5173",
 ]
 
