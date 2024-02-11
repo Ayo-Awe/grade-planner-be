@@ -39,6 +39,7 @@ async def upload_course_registration(file: UploadFile) -> SuccessResponse[Course
         semesters = parse_course_structure(await file.read())
         return format_response({"semesters": semesters})
 
-    except:
+    except Exception as e:
+        print(e)
         err_message = "Unable to parse course structure. Please provide a valid document"
         return format_error_response(err_message, "UNPROCESSABLE", 422)

@@ -3,6 +3,11 @@ import fitz
 import re
 
 
+class InvalidCourseStructure(Exception):
+    """Raised when unable to parse course structure"""
+    pass
+
+
 def parse_course_structure(stream: any) -> tuple[list[dict], list[str]]:
     rows = []
     doc = fitz.open(stream=stream)

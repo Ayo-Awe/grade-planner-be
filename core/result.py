@@ -5,6 +5,12 @@ import fitz
 from utils import calculate_cgpa
 
 
+class InvalidResult(Exception):
+    """Raised when unable to parse results
+    """
+    pass
+
+
 def parse_result(stream: any) -> list[list[dict]]:
     rows = []
     doc = fitz.open(stream=stream)
@@ -17,6 +23,9 @@ def parse_result(stream: any) -> list[list[dict]]:
     cgpa = round(calculate_cgpa(semesters), 2)
     total_units = reduce(lambda sum, sem: sum +
                          sem["total_units"], semesters, 0)
+
+    if len(semesters) == 0:
+        raise InvalidResult
 
     return {"semesters": semesters, "cgpa": cgpa, "total_units": total_units}
 

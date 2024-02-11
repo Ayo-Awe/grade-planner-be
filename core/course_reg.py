@@ -1,6 +1,11 @@
 import fitz
 
 
+class InvalidCourseRegistration(Exception):
+    """Raised when unable to parse course registration"""
+    pass
+
+
 def parse_course_registration(stream: any) -> list[dict]:
     rows = []
     doc = fitz.open(stream=stream)
@@ -9,6 +14,10 @@ def parse_course_registration(stream: any) -> list[dict]:
         rows.extend(tables[2].extract())
 
     courses = get_courses(rows)
+
+    if len(courses) == 0:
+        raise InvalidCourseRegistration
+
     return courses
 
 

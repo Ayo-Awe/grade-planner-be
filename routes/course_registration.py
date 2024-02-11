@@ -1,3 +1,4 @@
+from uuid import uuid4
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, UploadFile
 from pydantic import BaseModel
@@ -27,7 +28,7 @@ async def upload_course_registration(file: UploadFile) -> SuccessResponse[Course
             return format_error_response(err_message, "INVALID_FILE_TYPE", 400)
 
         courses = parse_course_registration(await file.read())
-        return format_response({"courses": courses})
+        return format_response({"courses": courses, "id": str(uuid4())})
 
     except:
         err_message = "Unable to parse course registration. Please supply a valid document"
